@@ -36,6 +36,7 @@ public:
             m_WritePoint = m_Data.begin() + overrun;
         }
 
+        // lock
         if (m_Size + count < m_Data.size())
             m_Size += count;
         else
@@ -47,6 +48,8 @@ public:
 
     size_t Read(T* dest, size_t count)
     {
+        // lock
+
         if (count > m_Size)
         {
             count = m_Size;
@@ -66,6 +69,40 @@ public:
         {
             std::copy(m_ReadPoint, m_Data.cend(), dest);
             std::copy(m_Data.cbegin(), m_Data.cbegin() + overrun, dest + distanceToEnd);
+            m_ReadPoint = m_Data.cbegin() + overrun;
+        }
+
+        m_Size -= count;
+        return count;
+    }
+
+    size_t ReadAndSum(T* dest, size_t count)
+    {
+        // lock
+
+        if (count > m_Size)
+        {
+            count = m_Size;
+            if (!count)
+                return count;
+        }
+
+        const int distanceToEnd{ m_Data.cend() - m_ReadPoint };
+        const int overrun{ static_cast<int>(count) - distanceToEnd };
+
+        if (overrun < 0)
+        {
+            std::transform(m_ReadPoint, m_ReadPoint + count, dest, dest, std::plus<T>());
+            m_ReadPoint += count;
+        }
+        else
+        {
+            std::transform(m_ReadPoint, m_Data.cend(), dest, dest, std::plus<T>());
+            std::transform(m_Data.cbegin(),
+                m_Data.cbegin() + overrun,
+                dest + distanceToEnd,
+                dest + distanceToEnd,
+                std::plus<T>());
             m_ReadPoint = m_Data.cbegin() + overrun;
         }
 
