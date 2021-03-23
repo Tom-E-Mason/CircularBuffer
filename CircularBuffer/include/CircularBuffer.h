@@ -2,6 +2,8 @@
 #pragma once
 
 #include <vector>
+#include <mutex>
+#include <memory>
 
 template<typename T>
 class CircularBuffer
@@ -36,7 +38,7 @@ public:
             m_WritePoint = m_Data.begin() + overrun;
         }
 
-        // lock
+        std::unique_lock<std::mutex> lk{ m_Mutex };
         if (m_Size + count < m_Data.size())
             m_Size += count;
         else
@@ -48,7 +50,7 @@ public:
 
     size_t Read(T* dest, size_t count)
     {
-        // lock
+        std::unique_lock<std::mutex> lk{ m_Mutex };
 
         if (count > m_Size)
         {
@@ -78,7 +80,7 @@ public:
 
     size_t ReadAndSum(T* dest, size_t count)
     {
-        // lock
+        std::unique_lock<std::mutex> lk{ m_Mutex };
 
         if (count > m_Size)
         {
@@ -115,4 +117,5 @@ private:
     Iterator m_WritePoint = m_Data.begin();
     ConstIterator m_ReadPoint = m_Data.cbegin();
     size_t m_Size = 0;
+    std::mutex m_Mutex;
 };
