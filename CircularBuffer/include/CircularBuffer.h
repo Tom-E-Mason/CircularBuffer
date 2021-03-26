@@ -19,8 +19,8 @@ public:
 
     void Write(const T* src, size_t count)
     {
-        const int distanceToEnd{ m_Data.cend() - m_WritePoint };
-        const int overrun{ static_cast<int>(count) - distanceToEnd };
+        const auto distanceToEnd{ m_Data.cend() - m_WritePoint };
+        const auto overrun{ static_cast<int>(count) - distanceToEnd };
 
         if (overrun < 0)
         {
@@ -58,8 +58,8 @@ public:
                 return count;
         }
 
-        const int distanceToEnd{ m_Data.cend() - m_ReadPoint };
-        const int overrun{ static_cast<int>(count) - distanceToEnd };
+        const auto distanceToEnd{ m_Data.cend() - m_ReadPoint };
+        const auto overrun{ static_cast<int>(count) - distanceToEnd };
 
         if (overrun < 0)
         {
@@ -88,8 +88,8 @@ public:
                 return count;
         }
 
-        const int distanceToEnd{ m_Data.cend() - m_ReadPoint };
-        const int overrun{ static_cast<int>(count) - distanceToEnd };
+        const auto distanceToEnd{ m_Data.cend() - m_ReadPoint };
+        const auto overrun{ static_cast<int>(count) - distanceToEnd };
 
         if (overrun < 0)
         {
