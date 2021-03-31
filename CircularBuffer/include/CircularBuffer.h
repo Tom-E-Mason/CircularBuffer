@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <mutex>
+#include <execution>
 
 template<typename T>
 class CircularBuffer
@@ -32,8 +33,8 @@ public:
             if (count > m_Data.size())
                 count = m_Data.size();
 
-            std::copy(src, src + distanceToEnd, m_WritePoint);
-            std::copy(src + distanceToEnd, src + count, m_Data.begin());
+            std::copy(std::execution::par, src, src + distanceToEnd, m_WritePoint);
+            std::copy(std::execution::par, src + distanceToEnd, src + count, m_Data.begin());
             m_WritePoint = m_Data.begin() + overrun;
         }
 
@@ -63,13 +64,13 @@ public:
 
         if (overrun < 0)
         {
-            std::copy(m_ReadPoint, m_ReadPoint + count, dest);
+            std::copy(std::execution::par, m_ReadPoint, m_ReadPoint + count, dest);
             m_ReadPoint += count;
         }
         else
         {
-            std::copy(m_ReadPoint, m_Data.cend(), dest);
-            std::copy(m_Data.cbegin(), m_Data.cbegin() + overrun, dest + distanceToEnd);
+            std::copy(std::execution::par, m_ReadPoint, m_Data.cend(), dest);
+            std::copy(std::execution::par, m_Data.cbegin(), m_Data.cbegin() + overrun, dest + distanceToEnd);
             m_ReadPoint = m_Data.cbegin() + overrun;
         }
 
@@ -93,13 +94,13 @@ public:
 
         if (overrun < 0)
         {
-            std::transform(m_ReadPoint, m_ReadPoint + count, dest, dest, std::plus<T>());
+            std::transform(std::execution::par, m_ReadPoint, m_ReadPoint + count, dest, dest, std::plus<T>());
             m_ReadPoint += count;
         }
         else
         {
-            std::transform(m_ReadPoint, m_Data.cend(), dest, dest, std::plus<T>());
-            std::transform(m_Data.cbegin(),
+            std::transform(std::execution::par, m_ReadPoint, m_Data.cend(), dest, dest, std::plus<T>());
+            std::transform(std::execution::par, m_Data.cbegin(),
                 m_Data.cbegin() + overrun,
                 dest + distanceToEnd,
                 dest + distanceToEnd,
